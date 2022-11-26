@@ -26,7 +26,7 @@ const App = () =>{
     const getSessionToken = async() =>{
       const sessionToken = await AsyncStorage.getItem('sessionToken');
       console.log('sessionToken', sessionToken);
-      const validateResponse = await fetch('https://dev.stedi.me/validate/' + sessionToken,
+      const validateResponse = await fetch('https://dev.stedi.me/validate' + sessionToken,
       {
         method: 'GET',
         headers: {
