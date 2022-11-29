@@ -30,7 +30,7 @@ const App = () =>{
       {
         method: 'GET',
         headers: {
-              'conten-type': 'application/text'
+              'content-type': 'application/text'
         }
      });
       if(validateResponse.status==200){ //good, non-expired token
@@ -45,7 +45,6 @@ const App = () =>{
    if (isFirstLaunch == true){
 return(
   <OnboardingScreen setFirstLaunch={setFirstLaunch}/>
- 
 );
   }else if(loggedInState == loggedInStates.LOGGED_IN){
     return <Navigation/>

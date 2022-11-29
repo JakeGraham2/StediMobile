@@ -3,7 +3,8 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, SafeAreaView , Share, ScrollView, Button} from 'react-native';
 import { Card, CardTitle, CardContent} from 'react-native-material-cards';
 import BarChart from 'react-native-bar-chart';
-import { Camera } from 'expo-camera';//new//
+import { Camera, CameraType } from 'expo-camera';//new//
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import Share from 'react-native-share';
 
 
@@ -22,10 +23,21 @@ import { Camera } from 'expo-camera';//new//
 // const horizontalData = ['S', 'M', 'T', 'W', 'T', 'F','S'];
 
 const Profile = (props) => {
+  const [userName, setUserName] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const[camerReady, setCameraReady] = useState(false);
+  const camerRef = useRef(null);
+
   useEffect(()=>{
     const getUserInfo = async ()=>{
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
-    };
+      const userName = await AsyncStorage.getItem('userName');
+      console.log('userName', userName);
+      setUserName(userName);
+      const profilePhoto = await AsyncStorage.getItem('profilePhoto');
+      setProfilePhoto(profilePhoto);
+
+    }
     getUserInfo();
   },[]);
 
@@ -42,6 +54,28 @@ const Profile = (props) => {
       }
     }
 
+  if(profilePhoto == null){
+    const cameraOptions={
+      quality:0,
+      exif:false
+    }
+return (
+  <View styles={styles.container}>
+    <Camera type = {CamerType.front}style={styles.camera} ref={camerRef} onCameraReady ={()=>{setCameraReady(true)}}>
+      <View style={styles.buttonContainer}>
+        {camerReady?<TouchableOpacity style = {styles.button} onPress= {async ()=>{
+          const picture = await camerRef.current.takePictureAsync(cameraOptions);
+          console.log('Picture',picture);
+          await AsyncStorage.setItem('profilePhoto',picture.uri);
+          setProfilePhoto(picture.uri);
+      }}>
+        <Text style={styles.text}> Take Picture</Text>
+        </TouchableOpacity> :null}
+      </View>
+    </Camera>
+  </View>
+);
+  } else {
   return (
     <SafeAreaView style={{flex: 1}}>
          <Card style={{backgroundColor:'white', borderRadius: 10, margin:20 ,width: 320, shadowColor: "#000",
@@ -66,7 +100,7 @@ elevation: 4}}>
     </CardContent>
     </Card>
  </SafeAreaView>
-  );
+  );}
 };
 export default Profile;
 const styles = StyleSheet.create({
