@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { StyleSheet, Text, View, Image, SafeAreaView , Share, ScrollView, Button} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import { StyleSheet, Text, View, Image, SafeAreaView , Share, ScrollView, Button, TouchableOpacity} from 'react-native';
 import { Card, CardTitle, CardContent} from 'react-native-material-cards';
 import BarChart from 'react-native-bar-chart';
 import { Camera, CameraType } from 'expo-camera';//new//
@@ -25,7 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Profile = (props) => {
   const [userName, setUserName] = useState("");
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const[camerReady, setCameraReady] = useState(false);
+  const[cameraReady, setCameraReady] = useState(false);
   const camerRef = useRef(null);
 
   useEffect(()=>{
@@ -60,10 +60,10 @@ const Profile = (props) => {
       exif:false
     }
 return (
-  <View styles={styles.container}>
-    <Camera type = {CamerType.front}style={styles.camera} ref={camerRef} onCameraReady ={()=>{setCameraReady(true)}}>
+  <View style={styles.container}>
+    <Camera type = {CameraType.front} style={styles.camera} ref={camerRef} onCameraReady ={()=>{setCameraReady(true)}}>
       <View style={styles.buttonContainer}>
-        {camerReady?<TouchableOpacity style = {styles.button} onPress= {async ()=>{
+        {cameraReady?<TouchableOpacity style = {styles.button} onPress= {async ()=>{
           const picture = await camerRef.current.takePictureAsync(cameraOptions);
           console.log('Picture',picture);
           await AsyncStorage.setItem('profilePhoto',picture.uri);
@@ -89,8 +89,8 @@ shadowRadius: 2.62,
 elevation: 4}}>
      <CardContent>
      <Image style={{height: 100, width:100, borderRadius: 75}}
-      source={require('../image/me.jpg')} />
-    <Text style={{marginTop:10,marginBottom:10,fontWeight: 'bold'}}>Sarah Romero</Text>
+      source={{uri:profilePhoto}} />
+    <Text style={{marginTop:10,marginBottom:10,fontWeight: 'bold'}}>{userName}</Text>
 
     <Text style={{marginTop:20,marginBottom:2}}>This Week's progress</Text>
 {/* <BarChart barColor='green' data={data} horizontalData={horizontalData} /> */}
@@ -106,6 +106,26 @@ export default Profile;
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    padding:20
-  }
+    justifyContent: 'center',
+    padding:20,
+},
+ camera: {
+   flex: 1,
+   },
+   buttonContainer: {
+     flex: 1,
+     flexDirection: 'row',
+     backgroundColor: 'transparent',
+     margin: 64,
+   },
+  button: {
+    flex: 1,
+     alignSelf: 'flex-end',
+   alignItems: 'center',
+  },
+  text: {
+    fontSize: 24,
+     fontWeight: 'bold',
+     color: 'white',
+   },
 })
